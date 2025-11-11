@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 # --- Imports LangChain récents ---
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_ollama import OllamaLLM
+# from langchain_ollama import OllamaLLM
 from langchain_community.llms import HuggingFaceHub
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains.retrieval import create_retrieval_chain
@@ -75,13 +75,13 @@ try:
             huggingfacehub_api_token=HUGGINGFACE_API_KEY
         )
         print("✅ LLM HuggingFace prêt.")
-    else:
-        LLM = OllamaLLM(
-            model=OLLAMA_MODEL,
-            base_url=OLLAMA_URL,
-            temperature=0.3
-        )
-        print(f"✅ LLM Ollama ({OLLAMA_MODEL}) prêt.")
+    # else:
+    #     LLM = OllamaLLM(
+    #         model=OLLAMA_MODEL,
+    #         base_url=OLLAMA_URL,
+    #         temperature=0.3
+    #     )
+    #     print(f"✅ LLM Ollama ({OLLAMA_MODEL}) prêt.")
 except Exception as e:
     print(f"❌ Erreur lors de l'initialisation du LLM : {e}")
     LLM = None
