@@ -1,0 +1,30 @@
+# --- Backend (API & Server) ---
+Flask
+flask-cors
+gunicorn # Nécessaire pour la production
+
+# --- Client LLM ---
+huggingface-hub # Pour la connexion à l'API Hugging Face
+langchain-core
+langchain-community # Contient LangChainHugginFaceHub
+
+# --- RAG/Embeddings ---
+faiss-cpu # Utilisation CPU, essentielle pour le plan gratuit (pas de GPU)
+sentence-transformers # Pour les embeddings (même si lourds, ils sont nécessaires)
+numpy # Requis par faiss et sentence-transformers
+scipy # Requis par sentence-transformers/scikit-learn/LangChain
+scikit-learn # Requis par LangChain/embeddings
+
+# --- Chargement de Documents (Utilisé par rag_builder.py, doit être inclus) ---
+unstructured # Pour charger les fichiers Word (si le builder est ré-exécuté)
+python-docx
+# L'importation de `UnstructuredWordDocumentLoader` dans votre code nécessite un ensemble 
+# de dépendances assez larges, mais gardons les plus critiques.
+
+# --- LangChain Core / Utilitaires ---
+langchain # Le paquet principal (même si LangChain le rend optionnel, gardons-le)
+python-dotenv
+pydantic
+PyYAML
+tenacity
+typing-extensions
