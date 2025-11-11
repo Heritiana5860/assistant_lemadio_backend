@@ -28,3 +28,6 @@ pydantic
 PyYAML
 tenacity
 typing-extensions
+
+langchain-ollama==0.3.3
+ollama==0.6.0
