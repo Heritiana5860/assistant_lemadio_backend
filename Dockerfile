@@ -1,36 +1,21 @@
-# Utiliser une image Python légère officielle
 FROM python:3.12-slim
 
-# Définir les variables d'environnement
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+WORKDIR /app
 
-# Installer les dépendances système nécessaires
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    g++ \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Définir le répertoire de travail
-WORKDIR /app
+COPY requirements_prod.txt .
+RUN pip install --no-cache-dir -r requirements_prod.txt
 
-# Copier uniquement les fichiers de dépendances d'abord (pour le cache Docker)
-COPY requirements.txt .
-
-# Installer les dépendances Python
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copier le reste des fichiers du projet
 COPY . .
 
-# Créer les dossiers nécessaires
 RUN mkdir -p logs rag/data
 
-# Exposer le port 5000 pour Flask
 EXPOSE 5000
 
-# Utiliser gunicorn pour la production (plus robuste que Flask dev server)
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "app_lc:app", "--workers", "1", "--timeout", "180", "--bind", "0.0.0.0:5000"]

@@ -1,0 +1,48 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - 11434:11434
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+    entrypoint: >
+      sh -c "
+      ollama serve &
+      echo 'Démarrage d''Ollama en arrière-plan...'
+      sleep 5
+      echo 'Téléchargement du modèle mistral:7b-instruct-q4_K_M (patienter ~2-4 min la première fois)...'
+      ollama pull mistral:7b-instruct-q4_K_M || true
+      echo 'Modèle prêt !'
+      wait
+      "
+
+  rag-chatbot:
+    build: .
+    container_name: rag-chatbot
+    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_started
+    environment:
+      - OLLAMA_MODEL=mistral:7b-instruct-q4_K_M
+      - OLLAMA_URL=http://ollama:11434
+    volumes:
+      - ./logs:/app/logs
+      - ./rag/data:/app/rag/data
+      - ./docs:/app/docs
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  ollama_data:

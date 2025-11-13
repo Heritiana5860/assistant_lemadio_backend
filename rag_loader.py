@@ -1,34 +1,25 @@
-# rag_loader.py
-import os
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import SentenceTransformerEmbeddings
+import os
 
 def initialize_rag_components(data_dir="rag/data", model_name="all-MiniLM-L6-v2"):
-    """
-    Initialise le système RAG : embeddings + VectorStore FAISS.
-    """
     try:
         embeddings = SentenceTransformerEmbeddings(
             model_name=model_name,
-            model_kwargs={"device": "cpu"}  # change en 'cuda' si tu as un GPU
+            model_kwargs={"device": "cpu"}
         )
-        
-        index_name = "faiss_index"
-
-        index_file_path = os.path.join(data_dir, f"{index_name}.faiss")
-        if not os.path.exists(index_file_path):
-            # Le message d'erreur est plus pertinent
-            raise FileNotFoundError(f"Index FAISS principal introuvable : {index_file_path}. Veuillez lancer rag_builder.py.")
+        index_path = os.path.join(data_dir, "faiss_index.faiss")
+        if not os.path.exists(index_path):
+            print(f"Index FAISS manquant : {index_path}")
+            return None, False
 
         vectorstore = FAISS.load_local(
             folder_path=data_dir,
             embeddings=embeddings,
-            index_name=index_name,
-            allow_dangerous_deserialization=True  # ⚠️ requis avec les nouvelles versions
+            index_name="faiss_index",
+            allow_dangerous_deserialization=True
         )
-
-        return vectorstore.as_retriever(), True
-
+        return vectorstore.as_retriever(search_kwargs={"k": 4}), True
     except Exception as e:
-        print(f"❌ Erreur lors du chargement RAG : {e}")
+        print(f"Erreur RAG : {e}")
         return None, False
